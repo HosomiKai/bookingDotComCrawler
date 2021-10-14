@@ -16,7 +16,7 @@ exports.config = {
   hooks: [],
   gherkin: {
     features: './features/*.feature',
-    steps: ['./step_definitions/steps.js']
+    steps: ['./step_definitions/steps.zh-TW.js']
   },
   plugins: {
     screenshotOnFail: {
@@ -30,7 +30,8 @@ exports.config = {
       enabled: true
     }
   },
-  tests: './*_test.js',
+  // It doesn't need to use now.
+  // tests: './*_test.js',
   name: 'owlnest-bdd',
   translation: 'zh-TW'
 }
