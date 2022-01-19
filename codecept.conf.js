@@ -2,7 +2,7 @@ exports.config = {
   output: './output',
   helpers: {
     Playwright: {
-      url: 'http://test.owlting.com',
+      url: 'https://tw.hotels.com/',
       show: true,
       browser: 'chromium'
     }
