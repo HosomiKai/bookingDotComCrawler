@@ -22,14 +22,38 @@ Then('輸入飯店 {string}', (w) => {
   I.wait(2)
   I.pressKey('ArrowDown');
   I.pressKey('Enter');
-
-  I.click('._3pFoIe.eLsxCc');
-  I.click('._3pFoIe.eLsxCc');
-  I.click('._3pFoIe.eLsxCc');
-
 })
 
+Then('看到 {string}', (w) => {
+  I.see('搜尋');
 
+  I.click('._3pFoIe.eLsxCc');
+  I.click('._3pFoIe.eLsxCc');
+  I.click('._3pFoIe.eLsxCc');
+})
+
+Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => { 
+  let checkInDate = new Date(y, m, d);
+
+  // add a day
+  //TODO: 需要解決日期超過月份日問題
+  checkInDate.setDate(checkInDate.getDate() + 1);
+  let checkOutDate = new Date(checkInDate);
+  
+  checkInDate = `${y.toString()}-${m.toString().padStart(2,"0")}-${d.toString().padStart(2,"0")}`;
+  checkOutDate = `${checkOutDate.getFullYear()}-${checkOutDate.getMonth().toString().padStart(2,"0")}-${checkOutDate.getDate().toString().padStart(2,"0")}`;
+  let bookingDate = {checkInDate, checkOutDate};
+
+  let uri = await I.executeScript((bookingDate) => {
+    let urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('q-check-in', bookingDate.checkInDate);
+    urlParams.set('q-check-out', bookingDate.checkOutDate);
+
+    return window.location.pathname + '?' + urlParams.toString();
+  }, bookingDate);
+
+  I.amOnPage(uri);
+})
 
 Then('查價錢', (w) => {
 
