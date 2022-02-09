@@ -4,7 +4,9 @@ exports.config = {
     Playwright: {
       url: 'https://tw.hotels.com/',
       show: true,
-      browser: 'chromium'
+      browser: 'chromium',
+      restart: 'keep',
+      keepBrowserState: true
     }
   },
   include: {
