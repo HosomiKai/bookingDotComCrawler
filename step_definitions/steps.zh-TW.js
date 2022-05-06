@@ -124,7 +124,7 @@ Then('查價錢', (w) =>
           .replace(/(?:,)/g, '')
           .replace(/(?:NT\$)/g, 'NT$,')
           .replace(/(?:<br>)/g, ',')
-          .replace('晚NT$', ',晚NT$')
+          .replace('晚NT$', '晚,NT$')
           .replace('稅金和其他費用', ',稅金和其他費用,')
           .replace('總價', ',總價,');
       });
