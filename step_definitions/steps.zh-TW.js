@@ -57,10 +57,6 @@ Then('查價錢', (w) =>
 {
   I.switchToNextTab();
   I.closeOtherTabs();
-  I.pressKey('End');
-  I.pressKey('Home');
-  I.pressKey('End');
-  I.pressKey('Home');
   I.click('客房');
 
   I.waitForElement('div.uitk-layout-flex.uitk-layout-flex-justify-content-space-between.uitk-spacing.uitk-spacing-margin-blockend-three > h2', 3); //選擇客房 
@@ -117,21 +113,26 @@ Then('查價錢', (w) =>
   }).then(function (hotel) {
     console.log('hotel,', hotel);
     hotel.plains.forEach((h, hIndex) => {
-      h.item_prices.forEach((i, iIndex) => {
-        output = hotel.plains[hIndex].item_prices[iIndex].replace(/(?:\r\n|\r|\n)/g, '<br>');
-        output = output.replace(/(?:,)/g, '');
-        output = output.replace(/(?:NT\$)/g, 'NT$,');
-        output = hotel.name + ',' + hotel.plains[hIndex].name.replace(/(?:,)/g, '&') + ',' + output
-        output = output.replace(/(?:<br>)/g, ',');
-        fs.writeFile('./hotels/hotel_'+hotel.name+'_.csv', output + '   \n', { flag: 'a+' }, err => {
-          if (err) {
-            console.error(err)
-            return
-          }
-        })
+      let output = hotel.name + ',' + h.name.replace(/(?:,)/g, '&') + ',';
+
+      h.item_prices.forEach((i, index) => {
+        output += i.replace(/(?:\r\n|\r|\n)/g, '<br>')
+          .replace(/(?:,)/g, '')
+          .replace(/(?:NT\$)/g, 'NT$,')
+          .replace(/(?:<br>)/g, ',')
+          .replace('晚NT$', '晚,NT$')
+          .replace('稅金和其他費用', ',稅金和其他費用,')
+          .replace('稅金NT$', ',稅金,NT$')
+          .replace('總價', ',總價,');
+      });
+
+      fs.writeFile('./hotels/hotel_' + hotel.name + '_.csv', output.replace(/(?:<br>)/g, ',') + '   \n', { flag: 'a+' }, err => {
+        if (err) {
+          console.error(err)
+          return
+        }
       })
     })
   });
-  I.wait(1000)
 })
 
