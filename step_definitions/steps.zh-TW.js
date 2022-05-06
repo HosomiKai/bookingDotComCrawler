@@ -3,33 +3,22 @@ require('dotenv').config();
 const fs = require('fs')
 // Add in your custom step files
 
-
 Given('拜訪頁面', () => {
   I.amOnPage('/');
 });
 
-Then('看到 {string}', (w) => {
-  I.see(w);
-})
-
-Then('不看到 {string}', (w) => {
-  I.dontSee(w);
+Then('看到目的地', (w) => {  
+  I.see('目的地');
 })
 
 Then('輸入飯店 {string}', (w) => {
-  I.click({ name: 'q-destination' });
-  I.fillField('q-destination', w);
+  I.click('目的地');
+  I.fillField('#location-field-destination', w);
   I.wait(2)
   I.pressKey('ArrowDown');
   I.pressKey('Enter');
-})
 
-Then('看到 {string}', (w) => {
-  I.see('搜尋');
-
-  I.click('._3pFoIe.eLsxCc');
-  I.click('._3pFoIe.eLsxCc');
-  I.click('._3pFoIe.eLsxCc');
+  I.click('搜尋');
 })
 
 Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => { 
@@ -46,8 +35,10 @@ Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => {
 
   let uri = await I.executeScript((bookingDate) => {
     let urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('q-check-in', bookingDate.checkInDate);
-    urlParams.set('q-check-out', bookingDate.checkOutDate);
+    urlParams.set('startDate', bookingDate.checkInDate);
+    urlParams.set('endDate', bookingDate.checkOutDate);
+    urlParams.set('d1', bookingDate.checkInDate);
+    urlParams.set('d2', bookingDate.checkOutDate);
 
     return window.location.pathname + '?' + urlParams.toString();
   }, bookingDate);
@@ -55,59 +46,69 @@ Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => {
   I.amOnPage(uri);
 })
 
-Then('查價錢', (w) => {
+Then('選旅館', () => {
+  I.see('選擇客房');
 
-  I.see('選擇客房')
-  I.waitForVisible('.y1QuoW section ul', 3);
+  I.click('選擇客房');
+})
+
+Then('查價錢', (w) => 
+{
+  I.pressKey('End');
+
+  I.wait(10);
+  // I.waitForVisible('#Offers > div > div:nth-child(3) > div', 3);
+
+  I.see('選擇客房');
 
   let plains = I.executeScript(function (e) {
     var hotel_name = '';                  //  set your counter to 1
 
-    console.log('hotel Name', hotel_name = document.querySelector("#main > div._3umLRC > div > div > section._34UURu > div._1quDY2 > div._2h6Jhd > h1").innerHTML)
-    console.log('plans ', document.querySelector(".y1QuoW section ul").children.length)
-    var plains = document.querySelector(".y1QuoW section ul").children.length
+    console.log('hotel Name', hotel_name = document.querySelector("#app-layer-base > div > main > div > div > div.uitk-layout-flex-item.main-body.m-t-margin-two.l-t-margin-three.xl-t-margin-three > section > div.infosite__content.infosite__content--details > div.uitk-layout-grid.uitk-layout-grid-columns-3 > div:nth-child(2) > div:nth-child(1) > div > div.uitk-layout-grid.uitk-layout-grid-columns-small-1.uitk-layout-grid-columns-medium-1.uitk-layout-grid-columns-large-12 > div.uitk-spacing.uitk-spacing-padding-large-inlineend-three.uitk-layout-grid-item.uitk-layout-grid-item-columnspan.uitk-layout-grid-item-columnspan-small-1.uitk-layout-grid-item-columnspan-medium-1.uitk-layout-grid-item-columnspan-large-8 > div.uitk-spacing.uitk-spacing-padding-small-blockend-four.uitk-spacing-padding-large-blockstart-three > h1").innerHTML)
+    
+    var items = document.querySelector("#Offers > div > div:nth-child(3) > div").children.length;
 
+    console.log('plans ', items)
+    
     var hotel = {};
-    hotel.plains = []
-    hotel.name = hotel_name
-    var kkk = 0
+    hotel.plains = [];
+    hotel.name = hotel_name;
 
-    for (plain = 1; plain <= plains; plain++) {
-      console.log('items...', document.querySelector(".y1QuoW section ul li:nth-child(" + plain + ") > div > div._7mutbU > ul").children.length)
-      var items = document.querySelector(".y1QuoW section ul li:nth-child(" + plain + ") > div > div._7mutbU > ul").children.length
+    const childNumReplaceString = '{@childNum}';
+    const priceChildNumReplaceString = '{@priceChildNum}';
+    
+    var itemSelector = '#Offers > div > div:nth-child(3) > div > div:nth-child('+childNumReplaceString+')';
+    var itemNameSelector = itemSelector + ' > div:nth-child(1) > div.uitk-spacing.uitk-spacing-padding-blockstart-three.uitk-spacing-padding-inline-three > div.uitk-spacing.uitk-spacing-padding-small-blockend-half > h3';
+    var itemPricesSelector = itemSelector + ' > div.uitk-spacing.uitk-spacing-padding-inline-three.uitk-spacing-padding-blockend-three.uitk-layout-flex-item-align-self-stretch.uitk-layout-flex-item > div > div > div:nth-child(1) > div > div.uitk-spacing.uitk-spacing-padding-blockstart-one > div > div > div > div.uitk-spacing.uitk-spacing-padding-block-three.uitk-spacing-border-blockend > div:nth-child(' + priceChildNumReplaceString + ')';
+    
+    
+    for (item = 1; item <= items; item++) {
+      console.log('now_item', item);
 
-      console.log('plain_name ', plain_name = document.querySelector(".y1QuoW section ul li:nth-child(" + plain + ")  > div > div._39YdZA > div._1Ocz2Z > div._3__H6i > h3").textContent)
+      var itemPrices = [];
 
+      var planName = document.querySelector(itemNameSelector.replace(childNumReplaceString, item)).textContent;
 
-      var item_prices = []
-      for (item = 1; item <= items; item++) {
-        if (plain == 1 && item == 1) {
-          continue
-        }
-        console.log('now_item', item)
-
-        document.querySelector(".y1QuoW section ul li:nth-child(" + plain + ") > div > div._7mutbU > ul > li:nth-child(" + item + ") > div > div.O7FDOI > button > span > span:nth-child(2)").click()
-
-        item_prices.push(kkk++)
-
+      //未稅價
+      let untaxedPrice = document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 1));
+      if (untaxedPrice == null){
+        continue;
       }
+      itemPrices.push(untaxedPrice.textContent);
+      //其他費用與稅金
+      itemPrices.push(document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 2)).textContent);
+      //總價
+      itemPrices.push(document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 3)).textContent);
 
       hotel.plains.push({
-        'name': plain_name,
-        'item_prices': item_prices,
+        'name': planName,
+        'item_prices': itemPrices,
       })
-
     }
 
-    hotel.plains.forEach((h, hIndex) => {
-      h.item_prices.forEach((i, iIndex) => {
-        const newValue = document.querySelectorAll('.modal-container section div ul')[i].innerText // get data
-        hotel.plains[hIndex].item_prices[iIndex] = newValue
-      })
-    })
     console.log(hotel);
 
-    return hotel
+    return hotel;
   }).then(function (hotel) {
     console.log('hotel,', hotel);
     hotel.plains.forEach((h, hIndex) => {
