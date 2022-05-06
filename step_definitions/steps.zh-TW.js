@@ -57,10 +57,6 @@ Then('查價錢', (w) =>
 {
   I.switchToNextTab();
   I.closeOtherTabs();
-  I.pressKey('End');
-  I.pressKey('Home');
-  I.pressKey('End');
-  I.pressKey('Home');
   I.click('客房');
 
   I.waitForElement('div.uitk-layout-flex.uitk-layout-flex-justify-content-space-between.uitk-spacing.uitk-spacing-margin-blockend-three > h2', 3); //選擇客房 
@@ -126,6 +122,7 @@ Then('查價錢', (w) =>
           .replace(/(?:<br>)/g, ',')
           .replace('晚NT$', '晚,NT$')
           .replace('稅金和其他費用', ',稅金和其他費用,')
+          .replace('稅金NT$', ',稅金,NT$')
           .replace('總價', ',總價,');
       });
 
