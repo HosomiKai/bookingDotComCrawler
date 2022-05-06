@@ -50,27 +50,32 @@ Then('選旅館', () => {
   I.see('選擇客房');
 
   I.click('選擇客房');
+
 })
 
 Then('查價錢', (w) => 
 {
+  I.switchToNextTab();
+  I.closeOtherTabs();
   I.pressKey('End');
+  I.pressKey('Home');
+  I.pressKey('End');
+  I.pressKey('Home');
+  I.click('客房');
 
-  I.wait(10);
-  // I.waitForVisible('#Offers > div > div:nth-child(3) > div', 3);
-
-  I.see('選擇客房');
+  I.waitForElement('div.uitk-layout-flex.uitk-layout-flex-justify-content-space-between.uitk-spacing.uitk-spacing-margin-blockend-three > h2', 3); //選擇客房 
+  I.waitForElement('#Offers > div > div:nth-child(3) > div', 3); // all rooms
 
   let plains = I.executeScript(function (e) {
     var hotel_name = '';                  //  set your counter to 1
-
-    console.log('hotel Name', hotel_name = document.querySelector("#app-layer-base > div > main > div > div > div.uitk-layout-flex-item.main-body.m-t-margin-two.l-t-margin-three.xl-t-margin-three > section > div.infosite__content.infosite__content--details > div.uitk-layout-grid.uitk-layout-grid-columns-3 > div:nth-child(2) > div:nth-child(1) > div > div.uitk-layout-grid.uitk-layout-grid-columns-small-1.uitk-layout-grid-columns-medium-1.uitk-layout-grid-columns-large-12 > div.uitk-spacing.uitk-spacing-padding-large-inlineend-three.uitk-layout-grid-item.uitk-layout-grid-item-columnspan.uitk-layout-grid-item-columnspan-small-1.uitk-layout-grid-item-columnspan-medium-1.uitk-layout-grid-item-columnspan-large-8 > div.uitk-spacing.uitk-spacing-padding-small-blockend-four.uitk-spacing-padding-large-blockstart-three > h1").innerHTML)
+    var hotel = {};
     
+    console.log('hotel Name', hotel_name = document.querySelector("div.uitk-spacing.uitk-spacing-padding-small-blockend-four.uitk-spacing-padding-large-blockstart-three > h1").innerHTML)
+
     var items = document.querySelector("#Offers > div > div:nth-child(3) > div").children.length;
 
     console.log('plans ', items)
     
-    var hotel = {};
     hotel.plains = [];
     hotel.name = hotel_name;
 
@@ -78,15 +83,15 @@ Then('查價錢', (w) =>
     const priceChildNumReplaceString = '{@priceChildNum}';
     
     var itemSelector = '#Offers > div > div:nth-child(3) > div > div:nth-child('+childNumReplaceString+')';
-    var itemNameSelector = itemSelector + ' > div:nth-child(1) > div.uitk-spacing.uitk-spacing-padding-blockstart-three.uitk-spacing-padding-inline-three > div.uitk-spacing.uitk-spacing-padding-small-blockend-half > h3';
-    var itemPricesSelector = itemSelector + ' > div.uitk-spacing.uitk-spacing-padding-inline-three.uitk-spacing-padding-blockend-three.uitk-layout-flex-item-align-self-stretch.uitk-layout-flex-item > div > div > div:nth-child(1) > div > div.uitk-spacing.uitk-spacing-padding-blockstart-one > div > div > div > div.uitk-spacing.uitk-spacing-padding-block-three.uitk-spacing-border-blockend > div:nth-child(' + priceChildNumReplaceString + ')';
+    var itemNameSelector = itemSelector + ' div.uitk-spacing.uitk-spacing-padding-small-blockend-half > h3';
+    var itemPricesSelector = itemSelector + ' div.uitk-spacing.uitk-spacing-padding-block-three.uitk-spacing-border-blockend > div:nth-child(' + priceChildNumReplaceString + ')';
     
     
     for (item = 1; item <= items; item++) {
       console.log('now_item', item);
 
       var itemPrices = [];
-
+      var planName = document.querySelector(itemNameSelector.replace(childNumReplaceString, item)).textContent;
       var planName = document.querySelector(itemNameSelector.replace(childNumReplaceString, item)).textContent;
 
       //未稅價
@@ -127,6 +132,6 @@ Then('查價錢', (w) =>
       })
     })
   });
-  I.wait(1)
+  I.wait(1000)
 })
 
