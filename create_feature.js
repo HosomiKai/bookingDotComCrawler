@@ -12,7 +12,7 @@ lineReader.on('line', function (line) {
           +' Then 看到目的地\n'
           +` Then 輸入飯店 "${line}"\n`;
 
-  let dateString = '2022 5 24';
+  let dateString = '2022 6 24';
   let checkInDate = new Date(dateString);
   let now = new Date();
   
