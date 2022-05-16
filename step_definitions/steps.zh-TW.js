@@ -63,43 +63,44 @@ Then('查價錢', (w) =>
   I.waitForElement('#Offers > div > div:nth-child(3) > div', 3); // all rooms
 
   let plains = I.executeScript(function (e) {
-    var hotel_name = '';                  //  set your counter to 1
+    var hotel_name = document.querySelector("div.uitk-spacing.uitk-spacing-padding-small-blockend-four.uitk-spacing-padding-large-blockstart-three > h1").innerHTML;
     var hotel = {};
-    
-    console.log('hotel Name', hotel_name = document.querySelector("div.uitk-spacing.uitk-spacing-padding-small-blockend-four.uitk-spacing-padding-large-blockstart-three > h1").innerHTML)
-
     var items = document.querySelector("#Offers > div > div:nth-child(3) > div").children.length;
-
+    console.log('hotel Name', hotel_name)
     console.log('plans ', items)
     
     hotel.plains = [];
     hotel.name = hotel_name;
-
-    const childNumReplaceString = '{@childNum}';
-    const priceChildNumReplaceString = '{@priceChildNum}';
-    
-    var itemSelector = '#Offers > div > div:nth-child(3) > div > div:nth-child('+childNumReplaceString+')';
-    var itemNameSelector = itemSelector + ' div.uitk-spacing.uitk-spacing-padding-small-blockend-half > h3';
-    var itemPricesSelector = itemSelector + ' div.uitk-spacing.uitk-spacing-padding-block-three.uitk-spacing-border-blockend > div:nth-child(' + priceChildNumReplaceString + ')';
-    
     
     for (item = 1; item <= items; item++) {
       console.log('now_item', item);
+      let itemSelector = '#Offers > div > div:nth-child(3) > div > div:nth-child('+item+')';
+      let itemNameSelector = itemSelector + ' div.uitk-spacing.uitk-spacing-padding-small-blockend-half > h3';
+      let planName = document.querySelector(itemNameSelector).textContent;
+      let itemPrices = [];
 
-      var itemPrices = [];
-      var planName = document.querySelector(itemNameSelector.replace(childNumReplaceString, item)).textContent;
-      var planName = document.querySelector(itemNameSelector.replace(childNumReplaceString, item)).textContent;
+      try {  
+        let priceDetailButtonSelector = itemSelector + ' > div.uitk-spacing.uitk-spacing-padding-inline-three.uitk-spacing-padding-blockend-three.uitk-layout-flex-item-align-self-stretch.uitk-layout-flex-item > div > div > div:nth-child(1) > div > button';
+        let untaxedPriceSelector = '#app-layer-price-presentation-'+item+'-0 > div.uitk-dialog.uitk-dialog-fullscreen.uitk-dialog-fullscreen-bg-default.uitk-dialog-height-auto > div > div.uitk-dialog-content > div > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(1)';
+        let taxSelector = '#app-layer-price-presentation-'+item+'-0 > div.uitk-dialog.uitk-dialog-fullscreen.uitk-dialog-fullscreen-bg-default.uitk-dialog-height-auto > div > div.uitk-dialog-content > div > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(2)';
+        let totalPriceSelector = '#app-layer-price-presentation-'+item+'-0 > div.uitk-dialog.uitk-dialog-fullscreen.uitk-dialog-fullscreen-bg-default.uitk-dialog-height-auto > div > div.uitk-dialog-content > div > div:nth-child(1) > div:nth-child(3) > table > tbody > tr:nth-child(1)';
 
-      //未稅價
-      let untaxedPrice = document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 1));
-      if (untaxedPrice == null){
-        continue;
+        //show price detail
+        document.querySelector(priceDetailButtonSelector).click();
+        
+        //未稅價
+        let untaxedPrice = document.querySelector(untaxedPriceSelector);
+        if (untaxedPrice == null){
+          continue;
+        }
+        itemPrices.push(untaxedPrice.textContent);
+        //其他費用與稅金
+        itemPrices.push(document.querySelector(taxSelector).textContent.replace('Additional information此為 Hotels.com 付給供應商 (例如：飯店) 的應繳稅款；如需詳細資訊，請參閱我們的使用條款。我們收取為您提供行程預訂的服務費。', ''));
+        //總價
+        itemPrices.push(document.querySelector(totalPriceSelector).textContent);
+      } catch (e) {
+        
       }
-      itemPrices.push(untaxedPrice.textContent);
-      //其他費用與稅金
-      itemPrices.push(document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 2)).textContent);
-      //總價
-      itemPrices.push(document.querySelector(itemPricesSelector.replace(childNumReplaceString, item).replace(priceChildNumReplaceString, 3)).textContent);
 
       hotel.plains.push({
         'name': planName,
@@ -124,6 +125,7 @@ Then('查價錢', (w) =>
           .replace('稅金和其他費用', ',稅金和其他費用,')
           .replace('稅金NT$', ',稅金,NT$')
           .replace('總價', ',總價,');
+          ;
       });
 
       fs.writeFile('./hotels/hotel_' + hotel.name + '_.csv', output.replace(/(?:<br>)/g, ',') + '   \n', { flag: 'a+' }, err => {
