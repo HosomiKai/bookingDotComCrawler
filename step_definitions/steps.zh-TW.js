@@ -13,12 +13,13 @@ Then('看到目的地', (w) => {
 
 Then('輸入飯店 {string}', (w) => {
   I.click('目的地');
-  I.fillField('#location-field-destination', w);
+  I.fillField('#destination_form_field', w);
   I.wait(2)
   I.pressKey('ArrowDown');
   I.pressKey('Enter');
 
-  I.click('搜尋');
+  I.click('#submit_button');
+  // I.click('搜尋');
 })
 
 Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => { 
@@ -47,10 +48,7 @@ Then('選擇入住時間 {int} {int} {int}', async (y, m, d) => {
 })
 
 Then('選旅館', () => {
-  I.see('選擇客房');
-
-  I.click('選擇客房');
-
+  I.click('#app-layer-base > div > main > div > div > div.uitk-layout-flex-item.main-body.m-t-margin-two.l-t-margin-three.xl-t-margin-three > section > div > div.uitk-spacing.search-results-listing.uitk-spacing-padding-small-block-three.uitk-spacing-padding-medium-blockstart-one.uitk-spacing-padding-large-blockstart-three > div > div.uitk-layout-grid-item.uitk-layout-grid-item-columnspan.uitk-layout-grid-item-columnspan-3 > section.results > ol > li:nth-child(1)');
 })
 
 Then('查價錢', (w) => 
